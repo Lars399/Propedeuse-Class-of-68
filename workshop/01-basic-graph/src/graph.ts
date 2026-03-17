@@ -19,10 +19,10 @@ export class Graph {
     }
 
     addEdge(from: NodeId, to: NodeId): void {
-        this.connections.get(from)!.push({ from, to });
+        this.connections.get(from)?.push({ from, to });
     }
 
     getConnections(id: NodeId): Edge[] {
-        return this.connections.get(id)!;
+        return this.connections.get(id) ?? [];
     }
 }

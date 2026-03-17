@@ -34,3 +34,51 @@ export interface Edge {
     to: NodeId;
 }
 ```
+
+The basic structure is ready, now the components need to come together.
+A class is made to represent a graph. Maps are used to store the components.
+First, a nodes field is introduced storing the individual nodes,
+secondly, a connections list is introduced. This concept is called an `adjacency list`.
+The nice thing about maps is the ability to use the `set` and  `get` methods.
+The positions are calculated rather than looked-up, which makes the structure whicked fast.
+If you are interested in why this is, look for [Hash Maps]https://en.wikipedia.org/wiki/Hash_table).
+In addition, get and set just reads better than endless loops 😂.
+
+It does require some explanation on the `?` and `??` operators.
+Both operators are used when it is possible to get an `undefined` value.
+The `addEdge` function below uses the `?` operator to determine whether the node exists in the list.
+If it exists, the push is executed. If it does not exist, nothing happens.
+The `??` operator is covered when it appears in code. 
+
+```ts
+export class Graph {
+    // The components of the graph
+    private nodes = new Map<NodeId, Node>();
+    private connections = new Map<NodeId, Edge[]>();
+
+    // Adding a node to the graph
+    addNode(id: NodeId): void {
+        this.nodes.set(id, { id });
+        this.connections.set(id, []);
+    }
+
+    // Adding a connection between to nodes
+    addEdge(from: NodeId, to: NodeId): void {
+        this.connections.get(from)?.push({ from, to });
+    }
+}
+```
+
+Finally, it is important that we make sure this works.
+Therefore, a method will be added that can be called later.
+This method returns the list of all edges for a specific node.
+It uses the `??` operator, if the operation on the left of the operator returns undefined, 
+the value on the right is returned instead. In other words:
+if the provided id is not present in the list of connections, an empty list is returned instead.
+
+```ts
+// Getting the edges for a specific node
+getConnections(id: NodeId): Edge[] {
+    return this.connections.get(id) ?? [];
+}
+```

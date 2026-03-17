@@ -10,6 +10,8 @@ graph.addEdge("A", "B");
 graph.addEdge("B", "C");
 graph.addEdge("A", "C");
 
+graph.addEdge("D", "A");
+
 const connections = graph.getConnections("A");
 
 connections.forEach(edge => {
