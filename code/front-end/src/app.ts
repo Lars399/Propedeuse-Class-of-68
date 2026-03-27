@@ -12,6 +12,8 @@ import type { CarId, HazardVisibility, SelectionState, TrackId } from './types';
 import { hazardLabel } from './risk/hazard';
 import type { YardLayout } from './types';
 import type { LoadedMvpData } from './data/loaders';
+import FireButton from './risk/FireButton'; // zorg dat het pad klopt
+import FireNotification from './risk/FireNotification.js';
 
 function buildLegendHTML(): string {
   return `
@@ -51,6 +53,7 @@ export function startApp(root: HTMLElement): void {
       <div class="spacer"></div>
       <button id="randomizeBtn" class="btn" type="button">🎲 Randomize</button>
       <button id="fireToggle" class="btn" aria-pressed="false" type="button">Fire mode: Off</button>
+      <button id="startFire" class="btn" aria-pressed="false" type="button"> Start fire</button>
     </div>
     <div class="content">
       <div class="map-wrap">
@@ -65,6 +68,9 @@ export function startApp(root: HTMLElement): void {
       </aside>
     </div>
   `;
+  // Plaats dit onderaan startApp(), nadat root.innerHTML is gezet
+const fireNotification = new FireNotification(); // jouw notificatiesysteem
+const fireButton = new FireButton(fireNotification); // haalt #startFire automatisch op
 
   if (Math.random() < 0.05) {
     const img = document.createElement('img');

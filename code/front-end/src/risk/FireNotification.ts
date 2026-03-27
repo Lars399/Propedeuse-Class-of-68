@@ -3,7 +3,7 @@
 // This TypeScript file is responsible for displaying fire notifications
 // and managing the UI display for fire alerts.
 
-class FireNotification {
+export default class FireNotification {
     private notificationContainer: HTMLElement;
 
     constructor() {
