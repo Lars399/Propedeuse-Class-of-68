@@ -14,6 +14,6 @@ Each directory contains a README.md file that provides more detailed information
 - `data/` contains data files that you may need for your project.
 - `lecture/` contains materials and resources from the lecture.
 
-- # Roles
+# Roles
 - Front-end: Iulia, dima
 - Back-end: Shiven, Kaan, Lars
