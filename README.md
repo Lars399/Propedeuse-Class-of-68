@@ -17,3 +17,4 @@ Each directory contains a README.md file that provides more detailed information
 # Roles
 - Front-end: Iulia, dima
 - Back-end: Shiven, Kaan, Lars
+

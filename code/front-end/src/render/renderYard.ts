@@ -164,8 +164,21 @@ export function renderYard(
     c.setAttribute('fill', '#ffb020');
     c.setAttribute('opacity', '0.85');
     connectorLayer.appendChild(c);
+
+    // Station name
+  const nameText = createSvgEl('text');
+  nameText.setAttribute('x', String(connector.position.x));
+  nameText.setAttribute('y', String(connector.position.y + 15));
+  nameText.setAttribute('text-anchor', 'middle');
+  nameText.setAttribute('font-size', '12');
+  nameText.setAttribute('fill', 'white');
+  nameText.textContent = stationNames[connectorId] ?? '';
+  connectorLayer.appendChild(nameText);
   }
+  
   svg.appendChild(connectorLayer);
+
+  
 
   // Cars (wagons).
   const carLayer = createSvgEl('g');
@@ -247,4 +260,32 @@ export function renderYard(
 
   svg.appendChild(carLayer);
 }
+
+const stationNames: Record<string, string> = {
+  C0: "Vlissingen West",
+  C1: "Vlissingen Centrum",
+  C2: "Vlissingen souburg",
+  C3: "Middelburg",
+  C4: "Anremuiden",
+  C5: "Kappele-Biezelinge",
+  C6: "Kruingen-Yerseke",
+  C7: "Krabbendijke",
+  C8: "Killand-bath",
+  C9: "Bergen op Zoom Markiezaat",
+  C10: "Bergen op Zoom",
+  C11: "Roosendaal West",
+  C12: "Moerven Sint Willebord",
+  C13: "Etten-Leur",
+  C14: "Antwerp",
+  C15: "",
+  C16: "Steenbergen",
+  C17: "Willemstad",
+  C18: "Numansdorp",
+  C19: "Rotterdam",
+  C20: "Oudenbosch",
+  C21: "Zevenbergen",
+  C22: "Breda",
+  C23: "Breda Prisenboek",
+  C24: "Lege zwaluwe"
+};
 
