@@ -118,12 +118,15 @@ const fireButton = new FireButton(fireNotification); // haalt #startFire automat
     svg.innerHTML = '';
   };
 
-  const updateUI = (): void => {
-    if (!layout) return;
-    const fireHighlights = computeFireHighlights(layout, fireMode, burningCarId);
-    renderYard(svg, layout, selection, fireHighlights, hazardVisibility);
-    renderPanel(panel, layout, selection, fireMode, burningCarId);
-  };
+const updateUI = (): void => {
+  if (!layout) return;
+  const fireHighlights = computeFireHighlights(layout, fireMode, burningCarId);
+  renderYard(svg, layout, selection, fireHighlights, hazardVisibility);
+  renderPanel(panel, layout, selection, fireMode, burningCarId);
+
+  // brandweerwagen emoji tekenen
+  renderFiretruckEmoji(svg, layout, burningCarId);
+};
 
   const getPlacedCarIds = (): CarId[] => {
     if (!layout) return [];
@@ -300,6 +303,22 @@ const igniteRandomHazard3Car = (): void => {
   fireToggle.setAttribute('aria-pressed', 'true');
   fireToggle.textContent = `Fire mode: On`;
   updateUI();
+
+  // Brand na 2 minuten automatisch uit
+  setTimeout(() => {
+    console.log(`[DEBUG] Wagon ${burningCarId} fire extinguished at ${new Date().toLocaleTimeString()}`);
+    burningCarId = null;
+    fireMode = false;
+
+    fireToggle.setAttribute('aria-pressed', 'false');
+    fireToggle.textContent = `Fire mode: Off`;
+
+    updateUI();
+
+    // Nieuw: popup dat de brand geblust is
+    fireNotification.showNotification(`✅ The fire has been extinguished!`);
+    console.log(`[DEBUG] Fire extinguished notification shown.`);
+  }, 10 * 1000); // 10 sec
 };
 
 // start de timer pas nadat de data is geladen
@@ -319,7 +338,27 @@ randomizeBtn.addEventListener('click', () => {
   if (!hazardInterval) {
     hazardInterval = window.setInterval(() => {
       igniteRandomHazard3Car();
-    }, 2 * 60 * 1000); // elke 10 seconden
+    }, 30 * 1000); // elke 30 seconden
   }
 });
+
+function renderFiretruckEmoji(svg: SVGSVGElement, layout: YardLayout, burningCarId: CarId | null) {
+  if (!burningCarId || !layout.carPlacements[burningCarId]) return;
+
+  const carPos = layout.carPlacements[burningCarId]; // verwacht {x, y}
+  if (!carPos) return;
+
+  // verwijder oude firetruck emoji
+  const oldTruck = svg.querySelector('#firetruck-emoji');
+  if (oldTruck) oldTruck.remove();
+
+  // nieuwe firetruck emoji
+  const truck = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  truck.setAttribute('id', 'firetruck-emoji');
+  truck.setAttribute('x', String(carPos.x + 20)); // iets rechts van de wagon
+  truck.setAttribute('y', String(carPos.y + 5));  // pas aan zodat het op lijn is
+  truck.setAttribute('font-size', '24');          // grootte van de emoji
+  truck.textContent = '🚒';
+  svg.appendChild(truck);
+}
 }
