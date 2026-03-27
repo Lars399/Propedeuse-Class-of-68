@@ -1,1 +1,72 @@
-{"connectors": [{"id": "1", "location": "Connector A"}, {"id": "2", "location": "Connector B"}], "tracks": [{"id": "1", "length": "5km"}, {"id": "2", "length": "10km"}]}
+{
+  "name": "Zeeland Railway Network",
+
+  "sensors": [
+    { "id": "AC1", "type": "axle_counter" },
+    { "id": "AC2", "type": "axle_counter" },
+    { "id": "AC3", "type": "axle_counter" },
+    { "id": "AC4", "type": "axle_counter" },
+    { "id": "AC5", "type": "axle_counter" },
+    { "id": "AC6", "type": "axle_counter" },
+    { "id": "AC7", "type": "axle_counter" },
+    { "id": "AC8", "type": "axle_counter" },
+    { "id": "AC9", "type": "axle_counter" },
+    { "id": "AC10", "type": "axle_counter" }
+  ],
+
+   "tracks": [
+    { "id": "T0", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T1", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T2", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T3", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T4", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T5", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T6", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T7", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T8", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T9", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T10", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T11", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T12", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T13", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T14", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T15", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T16", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T17", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T18", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T19", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T20", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T21", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T22", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T23", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null },
+    { "id": "T24", "incoming_axle_counter": null, "outgoing_axle_counter": null, "type": "main", "camera": null }
+  ],
+
+  "connectors": [
+    { "id": "C0", "incoming_tracks": [], "outgoing_tracks": ["T0"], "sensor": null, "type": "corner" },
+    { "id": "C1", "incoming_tracks": ["T0"], "outgoing_tracks": ["T1"], "sensor": null, "type": "corner" },
+    { "id": "C2", "incoming_tracks": ["T1"], "outgoing_tracks": ["T2"], "sensor": null, "type": "corner" },
+    { "id": "C3", "incoming_tracks": ["T2"], "outgoing_tracks": ["T3"], "sensor": null, "type": "corner" },
+    { "id": "C4", "incoming_tracks": ["T3"], "outgoing_tracks": ["T4"], "sensor": null, "type": "corner" },
+    { "id": "C5", "incoming_tracks": ["T4"], "outgoing_tracks": ["T5"], "sensor": null, "type": "corner" },
+    { "id": "C6", "incoming_tracks": ["T5"], "outgoing_tracks": ["T6"], "sensor": null, "type": "corner" },
+    { "id": "C7", "incoming_tracks": ["T6"], "outgoing_tracks": ["T7"], "sensor": null, "type": "corner" },
+    { "id": "C8", "incoming_tracks": ["T7"], "outgoing_tracks": ["T8"], "sensor": null, "type": "corner" },
+    { "id": "C9", "incoming_tracks": ["T8"], "outgoing_tracks": ["T9"], "sensor": null, "type": "corner" },
+    { "id": "C10", "incoming_tracks": ["T9"], "outgoing_tracks": ["T10"], "sensor": null, "type": "corner" },
+    { "id": "C11", "incoming_tracks": ["T10"], "outgoing_tracks": ["T11"], "sensor": null, "type": "corner" },
+    { "id": "C12", "incoming_tracks": ["T11"], "outgoing_tracks": ["T12"], "sensor": null, "type": "corner" },
+    { "id": "C13", "incoming_tracks": ["T12"], "outgoing_tracks": ["T13"], "sensor": null, "type": "corner" },
+    { "id": "C14", "incoming_tracks": ["T13"], "outgoing_tracks": ["T14"], "sensor": null, "type": "corner" },
+    { "id": "C15", "incoming_tracks": ["T14"], "outgoing_tracks": ["T15"], "sensor": null, "type": "corner" },
+    { "id": "C16", "incoming_tracks": ["T15"], "outgoing_tracks": ["T16"], "sensor": null, "type": "corner" },
+    { "id": "C17", "incoming_tracks": ["T16"], "outgoing_tracks": ["T17"], "sensor": null, "type": "corner" },
+    { "id": "C18", "incoming_tracks": ["T17"], "outgoing_tracks": ["T18"], "sensor": null, "type": "corner" },
+    { "id": "C19", "incoming_tracks": ["T18"], "outgoing_tracks": ["T19"], "sensor": null, "type": "corner" },
+    { "id": "C20", "incoming_tracks": ["T19"], "outgoing_tracks": ["T20"], "sensor": null, "type": "corner" },
+    { "id": "C21", "incoming_tracks": ["T20"], "outgoing_tracks": ["T21"], "sensor": null, "type": "corner" },
+    { "id": "C22", "incoming_tracks": ["T21"], "outgoing_tracks": ["T22"], "sensor": null, "type": "corner" },
+    { "id": "C23", "incoming_tracks": ["T22"], "outgoing_tracks": ["T23"], "sensor": null, "type": "corner" },
+    { "id": "C24", "incoming_tracks": ["T23"], "outgoing_tracks": [], "sensor": null, "type": "corner" }
+  ]
+}
