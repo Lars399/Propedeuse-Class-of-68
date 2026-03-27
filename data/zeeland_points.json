@@ -1,1 +1,32 @@
-{"points": {"Vlissingen": [0.1, 0.8], "Middelburg": [0.3, 0.7], "Goes": [0.5, 0.6], "Terneuzen": [0.6, 0.5], "Bergen op Zoom": [0.7, 0.2], "Roosendaal": [0.9, 0.1]}}
+[
+    {
+        "id": "vlissingen",
+        "x": 100,
+        "y": 200
+    },
+    {
+        "id": "middelburg",
+        "x": 200,
+        "y": 150
+    },
+    {
+        "id": "goes",
+        "x": 300,
+        "y": 180
+    },
+    {
+        "id": "terneuzen",
+        "x": 280,
+        "y": 100
+    },
+    {
+        "id": "bergen_op_zoom",
+        "x": 350,
+        "y": 80
+    },
+    {
+        "id": "roosendaal",
+        "x": 450,
+        "y": 60
+    }
+]
