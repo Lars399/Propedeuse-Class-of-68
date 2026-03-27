@@ -57,6 +57,13 @@ A delivery is a train that arrives to deliver card, pickup is the opposite of th
 An emplacement is a train that moves within the yard, and a transit is a train that passes through the yard.
 
 
+## state.*.json
+
+The `state.*.json` files contain the state of the yard at a specific point in time.
+There are two levels provided. The `state.basic.json` file is a basic state with switch positions and axle counts.
+The `state.advanced.json` file adds the position of the cars in the yard, which can be used for the visualization.
+
+
 ## yard.json
 
 The `yard.json` file contains information about the layout of the yard.

@@ -12,12 +12,6 @@
         "adr": null
     },
     {
-        "id": "RC1238",
-        "type": "tankcar",
-        "content": "water",
-        "adr": null
-    },
-    {
         "id": "RC2468",
         "type": "autotrack",
         "content": "nissan-ev hz-livery",

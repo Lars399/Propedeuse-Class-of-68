@@ -1,0 +1,17 @@
+{
+    "yard": "HZ Train Yard",
+    
+    "tracks": [
+        { "id": "T2C", "axles": 20 },
+        { "id": "T3B", "axles": 4 }
+    ],
+
+    "switches": [
+        { "id": "S1", "state": "straight" },
+        { "id": "S3", "state": "diverging" },
+        { "id": "S5", "state": "diverging" },
+        { "id": "S9", "state": "diverging" },
+        { "id": "S10", "state": "straight" },
+        { "id": "S11", "state": "straight" }
+    ]
+}
