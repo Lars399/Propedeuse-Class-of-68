@@ -1,0 +1,25 @@
+{
+    "yard": "HZ Train Yard",
+    
+    "tracks": [
+        {
+            "id": "T2C",
+            "axles": 20,
+            "cars": [ "RC6428", "RC6767", "RC4200", "RC6055", "RC2468" ]
+        },
+        {
+            "id": "T3B",
+            "axles": 4,
+            "cars": [ "RC0056" ]
+        }
+    ],
+
+    "switches": [
+        { "id": "S1", "state": "straight" },
+        { "id": "S3", "state": "diverging" },
+        { "id": "S5", "state": "diverging" },
+        { "id": "S9", "state": "diverging" },
+        { "id": "S10", "state": "straight" },
+        { "id": "S11", "state": "straight" }
+    ]
+}
