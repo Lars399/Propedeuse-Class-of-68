@@ -86,6 +86,7 @@ export function renderYard(
   selection: SelectionState,
   fireHighlights: FireHighlights,
   hazardVisibility: HazardVisibility,
+  movingCarIds: Set<CarId> = new Set(),
 ): void {
   // Clear previous content.
   while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -213,13 +214,26 @@ export function renderYard(
     // Optional glow ring for burning cars.
     if (glow) {
       const ring = createSvgEl('circle');
-      ring.setAttribute('cx', String(placement.x));
-      ring.setAttribute('cy', String(placement.y));
+      ring.setAttribute('cx', '0');
+      ring.setAttribute('cy', '0');
       ring.setAttribute('r', '20');
       ring.setAttribute('fill', 'rgba(255,45,45,0.08)');
       ring.setAttribute('stroke', 'rgba(255,45,45,0.55)');
       ring.setAttribute('stroke-width', '2');
       group.appendChild(ring);
+    }
+
+    // Optional glow ring for moving cars.
+    if (movingCarIds.has(carId)) {
+      const moveRing = createSvgEl('circle');
+      moveRing.setAttribute('cx', '0');
+      moveRing.setAttribute('cy', '0');
+      moveRing.setAttribute('r', '18');
+      moveRing.setAttribute('fill', 'rgba(125,211,252,0.1)');
+      moveRing.setAttribute('stroke', '#7dd3fc');
+      moveRing.setAttribute('stroke-width', '2');
+      moveRing.setAttribute('stroke-dasharray', '4 4');
+      group.appendChild(moveRing);
     }
 
     const w = 30;

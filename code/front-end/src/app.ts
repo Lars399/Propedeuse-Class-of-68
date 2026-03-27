@@ -8,10 +8,11 @@ import {
   setSelectionForCar,
   setSelectionForTrack,
 } from './ui/interactions';
-import type { CarId, HazardVisibility, SelectionState, TrackId } from './types';
+import type { CarId, HazardVisibility, SelectionState, TrackId, MovingCar } from './types';
 import { hazardLabel } from './risk/hazard';
 import type { YardLayout } from './types';
 import type { LoadedMvpData } from './data/loaders';
+import { createMovingCars, tickMovingCars, applyAnimationToPlacements } from './animation/movement';
 
 function buildLegendHTML(): string {
   return `
@@ -66,17 +67,6 @@ export function startApp(root: HTMLElement): void {
     </div>
   `;
 
-  if (Math.random() < 0.05) {
-    const img = document.createElement('img');
-    img.src = 'https://i.imgur.com/4M7IWwP.png';
-    img.style.position = 'absolute';
-    img.style.top = '20px';
-    img.style.right = '20px';
-    img.style.width = '120px';
-    img.style.zIndex = '999';
-    root.appendChild(img);
-  }
-
   const svg = root.querySelector('#yardSvg') as SVGSVGElement | null;
   const panel = root.querySelector('#panel') as HTMLElement | null;
   const fireToggle = root.querySelector('#fireToggle') as HTMLButtonElement | null;
@@ -98,6 +88,11 @@ export function startApp(root: HTMLElement): void {
   let fireMode = false;
   let burningCarId: CarId | null = null;
 
+  let animationRunning = true;
+  let movingCars: Record<CarId, MovingCar> = {};
+  let lastAnimTime = 0;
+  let animFrameId: number | null = null;
+
   let hazardVisibility: HazardVisibility = {
     safe: true,
     caution: true,
@@ -113,9 +108,32 @@ export function startApp(root: HTMLElement): void {
 
   const updateUI = (): void => {
     if (!layout) return;
-    const fireHighlights = computeFireHighlights(layout, fireMode, burningCarId);
-    renderYard(svg, layout, selection, fireHighlights, hazardVisibility);
-    renderPanel(panel, layout, selection, fireMode, burningCarId);
+
+    let currentLayout = layout;
+    if (animationRunning || Object.keys(movingCars).length > 0) {
+      currentLayout = { ...layout, carPlacements: applyAnimationToPlacements(layout, movingCars) };
+    }
+
+    const fireHighlights = computeFireHighlights(currentLayout, fireMode, burningCarId);
+    const movingCarSet = new Set(Object.keys(movingCars) as CarId[]);
+
+    renderYard(svg, currentLayout, selection, fireHighlights, hazardVisibility, movingCarSet);
+    renderPanel(panel, currentLayout, selection, fireMode, burningCarId);
+  };
+
+  const animLoop = (time: number) => {
+    if (!animationRunning) return;
+    if (lastAnimTime === 0) lastAnimTime = time;
+    const dt = (time - lastAnimTime) / 1000;
+    lastAnimTime = time;
+
+    // cap dt to avoid huge jumps
+    if (layout && dt < 0.1) {
+      tickMovingCars(layout, movingCars, dt);
+      updateUI();
+    }
+
+    animFrameId = requestAnimationFrame(animLoop);
   };
 
   const getPlacedCarIds = (): CarId[] => {
@@ -151,27 +169,27 @@ export function startApp(root: HTMLElement): void {
     }
   };
 
-const randomizeCarPositions = (): void => {
-  if (!dataRef) return;
+  const randomizeCarPositions = (): void => {
+    if (!dataRef) return;
 
-  const allTrackIds = dataRef.yard.tracks.map((t) => t.id);
+    const allTrackIds = dataRef.yard.tracks.map((t) => t.id);
 
-  // 🔥 rebuild with required fields
-  dataRef.stateAdvanced.tracks = allTrackIds.map((id) => ({
-    id,
-    cars: [],
-    axles: [], 
-  }));
+    // 🔥 rebuild with required fields
+    dataRef.stateAdvanced.tracks = allTrackIds.map((id) => ({
+      id,
+      cars: [],
+      axles: 0,
+    }));
 
-  for (const car of dataRef.cars) {
-    const randomTrackId = getRandomItem(allTrackIds);
+    for (const car of dataRef.cars) {
+      const randomTrackId = getRandomItem(allTrackIds);
 
-    const track = dataRef.stateAdvanced.tracks.find((t) => t.id === randomTrackId);
-    if (track) {
-      track.cars.push(car.id);
+      const track = dataRef.stateAdvanced.tracks.find((t) => t.id === randomTrackId);
+      if (track) {
+        track.cars.push(car.id);
+      }
     }
-  }
-};
+  };
 
   const rebuildLayoutFromData = (): void => {
     if (!dataRef) return;
@@ -184,6 +202,13 @@ const randomizeCarPositions = (): void => {
     randomizeCarsInData();
     randomizeCarPositions();
     rebuildLayoutFromData();
+
+    movingCars = {};
+    if (animationRunning && layout) {
+      movingCars = createMovingCars(layout, 3);
+      lastAnimTime = 0;
+      if (animFrameId === null) animFrameId = requestAnimationFrame(animLoop);
+    }
 
     const placedCarIds = getPlacedCarIds();
 
@@ -208,6 +233,11 @@ const randomizeCarPositions = (): void => {
     .then((data) => {
       dataRef = data;
       rebuildLayoutFromData();
+      if (layout && animationRunning) {
+        movingCars = createMovingCars(layout, 3);
+        lastAnimTime = 0;
+        if (animFrameId === null) animFrameId = requestAnimationFrame(animLoop);
+      }
       updateUI();
     })
     .catch((err) => {
@@ -231,6 +261,8 @@ const randomizeCarPositions = (): void => {
   randomizeBtn.addEventListener('click', () => {
     randomizeYard();
   });
+
+
 
   fireToggle.addEventListener('click', () => {
     fireMode = !fireMode;

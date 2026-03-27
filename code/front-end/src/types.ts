@@ -114,6 +114,14 @@ export interface HazardVisibility {
   onFire: boolean;
 }
 
+export interface MovingCar {
+  carId: CarId;
+  currentTrackId: TrackId;
+  progress: number; // 0.0 to 1.0 along the track
+  direction: 1 | -1; // 1 = start to end, -1 = end to start
+  speed: number; // units of progress per second
+}
+
 export interface YardLayout {
   name: string;
   connectors: Record<ConnectorId, ConnectorNode>;
