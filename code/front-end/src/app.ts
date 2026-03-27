@@ -8,10 +8,11 @@ import {
   setSelectionForCar,
   setSelectionForTrack,
 } from './ui/interactions';
-import type { CarId, HazardVisibility, SelectionState, TrackId } from './types';
+import type { CarId, HazardVisibility, SelectionState, TrackId, MovingCar } from './types';
 import { hazardLabel } from './risk/hazard';
 import type { YardLayout } from './types';
 import type { LoadedMvpData } from './data/loaders';
+import { createMovingCars, tickMovingCars, applyAnimationToPlacements } from './animation/movement';
 
 function buildLegendHTML(): string {
   return `
@@ -50,6 +51,7 @@ export function startApp(root: HTMLElement): void {
       <h1>Tracks in the Dark - Danger Map</h1>
       <div class="spacer"></div>
       <button id="randomizeBtn" class="btn" type="button">🎲 Randomize</button>
+      <button id="animToggle" class="btn" aria-pressed="false" type="button">▶️ Start Animation</button>
       <button id="fireToggle" class="btn" aria-pressed="false" type="button">Fire mode: Off</button>
     </div>
     <div class="content">
@@ -81,6 +83,7 @@ export function startApp(root: HTMLElement): void {
   const panel = root.querySelector('#panel') as HTMLElement | null;
   const fireToggle = root.querySelector('#fireToggle') as HTMLButtonElement | null;
   const randomizeBtn = root.querySelector('#randomizeBtn') as HTMLButtonElement | null;
+  const animToggle = root.querySelector('#animToggle') as HTMLButtonElement | null;
 
   const hazSafe = root.querySelector('#hazSafe') as HTMLInputElement | null;
   const hazCaution = root.querySelector('#hazCaution') as HTMLInputElement | null;
@@ -97,6 +100,11 @@ export function startApp(root: HTMLElement): void {
   let selection: SelectionState = { selectedCarId: null, selectedTrackId: null };
   let fireMode = false;
   let burningCarId: CarId | null = null;
+  
+  let animationRunning = false;
+  let movingCars: Record<CarId, MovingCar> = {};
+  let lastAnimTime = 0;
+  let animFrameId: number | null = null;
 
   let hazardVisibility: HazardVisibility = {
     safe: true,
@@ -113,9 +121,32 @@ export function startApp(root: HTMLElement): void {
 
   const updateUI = (): void => {
     if (!layout) return;
-    const fireHighlights = computeFireHighlights(layout, fireMode, burningCarId);
-    renderYard(svg, layout, selection, fireHighlights, hazardVisibility);
-    renderPanel(panel, layout, selection, fireMode, burningCarId);
+    
+    let currentLayout = layout;
+    if (animationRunning || Object.keys(movingCars).length > 0) {
+      currentLayout = { ...layout, carPlacements: applyAnimationToPlacements(layout, movingCars) };
+    }
+
+    const fireHighlights = computeFireHighlights(currentLayout, fireMode, burningCarId);
+    const movingCarSet = new Set(Object.keys(movingCars) as CarId[]);
+    
+    renderYard(svg, currentLayout, selection, fireHighlights, hazardVisibility, movingCarSet);
+    renderPanel(panel, currentLayout, selection, fireMode, burningCarId);
+  };
+
+  const animLoop = (time: number) => {
+    if (!animationRunning) return;
+    if (lastAnimTime === 0) lastAnimTime = time;
+    const dt = (time - lastAnimTime) / 1000;
+    lastAnimTime = time;
+
+    // cap dt to avoid huge jumps
+    if (layout && dt < 0.1) {
+      tickMovingCars(layout, movingCars, dt);
+      updateUI();
+    }
+    
+    animFrameId = requestAnimationFrame(animLoop);
   };
 
   const getPlacedCarIds = (): CarId[] => {
@@ -160,7 +191,7 @@ const randomizeCarPositions = (): void => {
   dataRef.stateAdvanced.tracks = allTrackIds.map((id) => ({
     id,
     cars: [],
-    axles: [], 
+    axles: 0, 
   }));
 
   for (const car of dataRef.cars) {
@@ -184,6 +215,11 @@ const randomizeCarPositions = (): void => {
     randomizeCarsInData();
     randomizeCarPositions();
     rebuildLayoutFromData();
+
+    movingCars = {};
+    if (animationRunning && layout) {
+      movingCars = createMovingCars(layout, 3);
+    }
 
     const placedCarIds = getPlacedCarIds();
 
@@ -230,6 +266,23 @@ const randomizeCarPositions = (): void => {
 
   randomizeBtn.addEventListener('click', () => {
     randomizeYard();
+  });
+
+  animToggle?.addEventListener('click', () => {
+    animationRunning = !animationRunning;
+    if (animationRunning) {
+      if (layout && Object.keys(movingCars).length === 0) {
+         movingCars = createMovingCars(layout, 3);
+      }
+      animToggle.textContent = '⏸️ Pause Animation';
+      animToggle.setAttribute('aria-pressed', 'true');
+      lastAnimTime = 0;
+      animFrameId = requestAnimationFrame(animLoop);
+    } else {
+      animToggle.textContent = '▶️ Start Animation';
+      animToggle.setAttribute('aria-pressed', 'false');
+      if (animFrameId !== null) cancelAnimationFrame(animFrameId);
+    }
   });
 
   fireToggle.addEventListener('click', () => {
