@@ -15,6 +15,9 @@ import type { LoadedMvpData } from './data/loaders';
 import { createMovingCars, tickMovingCars, applyAnimationToPlacements } from './animation/movement';
 import React, { useState } from 'react';
 
+import FireButton from './risk/FireButton'; // zorg dat het pad klopt
+import FireNotification from './risk/FireNotification.js';
+import { hazardLevelForCar } from './risk/hazard'; // correct pad naar hazard.ts
 
 function buildLegendHTML(): string {
   return `
@@ -54,6 +57,7 @@ export function startApp(root: HTMLElement): void {
       <div class="spacer"></div>
       <button id="randomizeBtn" class="btn" type="button">🎲 Randomize</button>
       <button id="fireToggle" class="btn" aria-pressed="false" type="button">Fire mode: Off</button>
+      <button id="startFire" class="btn" aria-pressed="false" type="button"> Start fire</button>
     </div>
     <div class="content">
       <div class="map-wrap">
@@ -68,6 +72,20 @@ export function startApp(root: HTMLElement): void {
       </aside>
     </div>
   `;
+  // Plaats dit onderaan startApp(), nadat root.innerHTML is gezet
+const fireNotification = new FireNotification(); // jouw notificatiesysteem
+const fireButton = new FireButton(fireNotification); // haalt #startFire automatisch op
+
+  if (Math.random() < 0.05) {
+    const img = document.createElement('img');
+    img.src = 'https://i.imgur.com/4M7IWwP.png';
+    img.style.position = 'absolute';
+    img.style.top = '20px';
+    img.style.right = '20px';
+    img.style.width = '120px';
+    img.style.zIndex = '999';
+    root.appendChild(img);
+  }
 
   const svg = root.querySelector('#yardSvg') as SVGSVGElement | null;
   const panel = root.querySelector('#panel') as HTMLElement | null;
@@ -302,6 +320,89 @@ export function startApp(root: HTMLElement): void {
       updateUI();
     });
   }
+
+// Vind alle wagons met hazard-level 3
+const igniteRandomHazard3Car = (): void => {
+  if (!dataRef || !layout) return;
+
+  // Vind alle wagons met hazard-level 3
+  const hazard3Cars = dataRef.cars.filter(car => hazardLevelForCar(car) === 3);
+  if (hazard3Cars.length === 0) return;
+
+  // Kies er één random
+  const carToIgnite = getRandomItem(hazard3Cars);
+
+  burningCarId = carToIgnite.id;
+  fireMode = true;
+
+  // Debug log
+  console.log(`[DEBUG] Wagon ${burningCarId} is now on fire at ${new Date().toLocaleTimeString()}`);
+
+  // Notificatie tonen
+  fireNotification.showNotification(`🚨 Wagon #${burningCarId} is now on fire!`);
+
+  // UI updaten
+  fireToggle.setAttribute('aria-pressed', 'true');
+  fireToggle.textContent = `Fire mode: On`;
+  updateUI();
+
+  // Brand na 2 minuten automatisch uit
+  setTimeout(() => {
+    console.log(`[DEBUG] Wagon ${burningCarId} fire extinguished at ${new Date().toLocaleTimeString()}`);
+    burningCarId = null;
+    fireMode = false;
+
+    fireToggle.setAttribute('aria-pressed', 'false');
+    fireToggle.textContent = `Fire mode: Off`;
+
+    updateUI();
+
+    // Nieuw: popup dat de brand geblust is
+    fireNotification.showNotification(`✅ The fire has been extinguished!`);
+    console.log(`[DEBUG] Fire extinguished notification shown.`);
+  }, 10 * 1000); // 10 sec
+};
+
+// start de timer pas nadat de data is geladen
+loadMvpData()
+  .then((data) => {
+    dataRef = data;
+    rebuildLayoutFromData();
+    updateUI();
+  })
+
+  let hazardInterval: number | null = null;
+
+randomizeBtn.addEventListener('click', () => {
+  randomizeYard();
+
+  // Start interval alleen als het nog niet loopt
+  if (!hazardInterval) {
+    hazardInterval = window.setInterval(() => {
+      igniteRandomHazard3Car();
+    }, 30 * 1000); // elke 30 seconden
+  }
+});
+
+function renderFiretruckEmoji(svg: SVGSVGElement, layout: YardLayout, burningCarId: CarId | null) {
+  if (!burningCarId || !layout.carPlacements[burningCarId]) return;
+
+  const carPos = layout.carPlacements[burningCarId]; // verwacht {x, y}
+  if (!carPos) return;
+
+  // verwijder oude firetruck emoji
+  const oldTruck = svg.querySelector('#firetruck-emoji');
+  if (oldTruck) oldTruck.remove();
+
+  // nieuwe firetruck emoji
+  const truck = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  truck.setAttribute('id', 'firetruck-emoji');
+  truck.setAttribute('x', String(carPos.x + 20)); // iets rechts van de wagon
+  truck.setAttribute('y', String(carPos.y + 5));  // pas aan zodat het op lijn is
+  truck.setAttribute('font-size', '24');          // grootte van de emoji
+  truck.textContent = '🚒';
+  svg.appendChild(truck);
+}
 
   const mapWrap = root.querySelector('.map-wrap') as HTMLElement;
   if (mapWrap) {
