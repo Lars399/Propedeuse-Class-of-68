@@ -139,6 +139,9 @@ const fireButton = new FireButton(fireNotification); // haalt #startFire automat
 
     renderYard(svg, currentLayout, selection, fireHighlights, hazardVisibility, movingCarSet);
     renderPanel(panel, currentLayout, selection, fireMode, burningCarId);
+
+    // brandweerwagen emoji tekenen
+    renderFiretruckEmoji(svg, layout, burningCarId);
   };
 
   const animLoop = (time: number) => {
