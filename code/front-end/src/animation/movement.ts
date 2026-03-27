@@ -37,6 +37,10 @@ export function tickMovingCars(
 ): void {
   for (const carId in movingCars) {
     const car = movingCars[carId];
+
+    // ✨ Nieuw: skip deze wagen als hij gepauzeerd is
+    if (car.paused) continue;
+
     const track = layout.tracks[car.currentTrackId];
     if (!track) continue; // Track vanished?
 

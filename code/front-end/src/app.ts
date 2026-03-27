@@ -238,6 +238,10 @@ const fireButton = new FireButton(fireNotification); // haalt #startFire automat
     if (placedCarIds.length > 0 && Math.random() < 0.5) {
       burningCarId = getRandomItem(placedCarIds);
       fireMode = true;
+      // ✨ stop de wagen tijdelijk
+      if (movingCars[burningCarId]) {
+        movingCars[burningCarId].paused = true;
+      }
     } else {
       burningCarId = null;
       fireMode = false;
@@ -328,23 +332,21 @@ const fireButton = new FireButton(fireNotification); // haalt #startFire automat
 const igniteRandomHazard3Car = (): void => {
   if (!dataRef || !layout) return;
 
-  // Vind alle wagons met hazard-level 3
   const hazard3Cars = dataRef.cars.filter(car => hazardLevelForCar(car) === 3);
   if (hazard3Cars.length === 0) return;
 
-  // Kies er één random
   const carToIgnite = getRandomItem(hazard3Cars);
-
   burningCarId = carToIgnite.id;
   fireMode = true;
 
-  // Debug log
-  console.log(`[DEBUG] Wagon ${burningCarId} is now on fire at ${new Date().toLocaleTimeString()}`);
+  // Pauzeer bewegende wagen als die brandt
+  if (movingCars[burningCarId]) {
+    movingCars[burningCarId].paused = true;
+  }
 
-  // Notificatie tonen
+  console.log(`[DEBUG] Wagon ${burningCarId} is now on fire at ${new Date().toLocaleTimeString()}`);
   fireNotification.showNotification(`🚨 Wagon #${burningCarId} is now on fire!`);
 
-  // UI updaten
   fireToggle.setAttribute('aria-pressed', 'true');
   fireToggle.textContent = `Fire mode: On`;
   updateUI();
@@ -352,18 +354,23 @@ const igniteRandomHazard3Car = (): void => {
   // Brand na 2 minuten automatisch uit
   setTimeout(() => {
     console.log(`[DEBUG] Wagon ${burningCarId} fire extinguished at ${new Date().toLocaleTimeString()}`);
+    
+    // Laat de wagen weer verder rijden
+  if (burningCarId && movingCars[burningCarId]) {
+    movingCars[burningCarId].paused = false;
+  }
+
     burningCarId = null;
     fireMode = false;
 
     fireToggle.setAttribute('aria-pressed', 'false');
     fireToggle.textContent = `Fire mode: Off`;
-
     updateUI();
+    
 
-    // Nieuw: popup dat de brand geblust is
     fireNotification.showNotification(`✅ The fire has been extinguished!`);
     console.log(`[DEBUG] Fire extinguished notification shown.`);
-  }, 10 * 1000); // 10 sec
+  }, 10 * 1000); // 2 minuten
 };
 
 // start de timer pas nadat de data is geladen
