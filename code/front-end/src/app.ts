@@ -14,6 +14,7 @@ import type { YardLayout } from './types';
 import type { LoadedMvpData } from './data/loaders';
 import FireButton from './risk/FireButton'; // zorg dat het pad klopt
 import FireNotification from './risk/FireNotification.js';
+import { hazardLevelForCar } from './risk/hazard'; // correct pad naar hazard.ts
 
 function buildLegendHTML(): string {
   return `
@@ -274,4 +275,51 @@ const randomizeCarPositions = (): void => {
       updateUI();
     });
   }
+
+// Vind alle wagons met hazard-level 3
+const igniteRandomHazard3Car = (): void => {
+  if (!dataRef || !layout) return;
+
+  // Vind alle wagons met hazard-level 3
+  const hazard3Cars = dataRef.cars.filter(car => hazardLevelForCar(car) === 3);
+  if (hazard3Cars.length === 0) return;
+
+  // Kies er één random
+  const carToIgnite = getRandomItem(hazard3Cars);
+
+  burningCarId = carToIgnite.id;
+  fireMode = true;
+
+  // Debug log
+  console.log(`[DEBUG] Wagon ${burningCarId} is now on fire at ${new Date().toLocaleTimeString()}`);
+
+  // Notificatie tonen
+  fireNotification.showNotification(`🚨 Wagon #${burningCarId} is now on fire!`);
+
+  // UI updaten
+  fireToggle.setAttribute('aria-pressed', 'true');
+  fireToggle.textContent = `Fire mode: On`;
+  updateUI();
+};
+
+// start de timer pas nadat de data is geladen
+loadMvpData()
+  .then((data) => {
+    dataRef = data;
+    rebuildLayoutFromData();
+    updateUI();
+  })
+
+  let hazardInterval: number | null = null;
+
+randomizeBtn.addEventListener('click', () => {
+  randomizeYard();
+
+  // Start interval alleen als het nog niet loopt
+  if (!hazardInterval) {
+    hazardInterval = window.setInterval(() => {
+      igniteRandomHazard3Car();
+    }, 2 * 60 * 1000); // elke 10 seconden
+  }
+});
 }
