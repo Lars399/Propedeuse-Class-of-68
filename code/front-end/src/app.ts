@@ -46,7 +46,7 @@ function getRandomItem<T>(arr: T[]): T {
 
 export function startApp(root: HTMLElement): void {
   root.innerHTML = `
-    <div class="topbar">
+    <div class="topbar"> 
       <h1>Tracks in the Dark - Danger Map</h1>
       <div class="spacer"></div>
       <button id="randomizeBtn" class="btn" type="button">🎲 Randomize</button>
@@ -151,6 +151,28 @@ export function startApp(root: HTMLElement): void {
     }
   };
 
+const randomizeCarPositions = (): void => {
+  if (!dataRef) return;
+
+  const allTrackIds = dataRef.yard.tracks.map((t) => t.id);
+
+  // 🔥 rebuild with required fields
+  dataRef.stateAdvanced.tracks = allTrackIds.map((id) => ({
+    id,
+    cars: [],
+    axles: [], 
+  }));
+
+  for (const car of dataRef.cars) {
+    const randomTrackId = getRandomItem(allTrackIds);
+
+    const track = dataRef.stateAdvanced.tracks.find((t) => t.id === randomTrackId);
+    if (track) {
+      track.cars.push(car.id);
+    }
+  }
+};
+
   const rebuildLayoutFromData = (): void => {
     if (!dataRef) return;
     layout = buildLayout(dataRef);
@@ -160,6 +182,7 @@ export function startApp(root: HTMLElement): void {
     if (!dataRef) return;
 
     randomizeCarsInData();
+    randomizeCarPositions();
     rebuildLayoutFromData();
 
     const placedCarIds = getPlacedCarIds();
