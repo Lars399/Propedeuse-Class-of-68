@@ -18,8 +18,8 @@ export interface LoadedMvpData {
 
 export async function loadMvpData(): Promise<LoadedMvpData> {
   const [yard, points, cars, stateBasic, stateAdvanced] = await Promise.all([
-    loadJson<YardJson>('/yard.json'),
-    loadJson<PointsJsonItem[]>('/points.json'),
+    loadJson<YardJson>('/zeeland_yard.json'),
+    loadJson<PointsJsonItem[]>('/zeeland_points.json'),
     loadJson<CarJson[]>('/cars.json'),
     loadJson<StateJsonBase>('/state.basic.json'),
     loadJson<StateJsonBase>('/state.advanced.json'),
