@@ -1,2 +1,29 @@
-# Build artifacts
-js/
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+
+# Compiled files
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+
+# Environment
+.env
+.env.local
