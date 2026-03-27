@@ -13,6 +13,8 @@ import { hazardLabel } from './risk/hazard';
 import type { YardLayout } from './types';
 import type { LoadedMvpData } from './data/loaders';
 import { createMovingCars, tickMovingCars, applyAnimationToPlacements } from './animation/movement';
+import React, { useState } from 'react';
+
 
 function buildLegendHTML(): string {
   return `
@@ -300,4 +302,28 @@ export function startApp(root: HTMLElement): void {
       updateUI();
     });
   }
+
+  const mapWrap = root.querySelector('.map-wrap') as HTMLElement;
+  if (mapWrap) {
+    mapWrap.style.transition = 'transform 0.3s ease-in-out';
+    mapWrap.style.cursor = 'zoom-in';
+    mapWrap.style.transformOrigin = 'top center';
+
+    let isZoomed = false;
+
+    mapWrap.addEventListener('click', (e) => {
+      // Don't zoom if clicking checkboxes or buttons
+      if ((e.target as HTMLElement).closest('.legend, button')) return;
+
+      isZoomed = !isZoomed;
+      mapWrap.style.transform = isZoomed ? 'scale(1.8)' : 'scale(1)';
+      mapWrap.style.cursor = isZoomed ? 'zoom-out' : 'zoom-in';
+      mapWrap.style.zIndex = isZoomed ? '100' : '1';
+      mapWrap.style.position = 'relative';
+    });
+  }
 }
+ 
+
+
+
